@@ -47,7 +47,7 @@
       </mat-list-item>
     </mat-list>
   </div>
-  <form novalidate [formGroup]="newCommentForm" #fform="ngForm" (ngSubmit)="onSubmit()">
+  <form novalidate [formGroup]="newCommentForm" #fform="ngForm" (ngSubmit)="onSubmit()" *ngIf="dish">
     <p>
       <mat-form-field class="half-width">
         <input matInput formControlName="author" placeholder="Name" type="text" required>
@@ -65,7 +65,11 @@
     </p>
     <button type="submit" mat-button class="background-primary text-floral-white" [disabled]="newCommentForm.invalid">Submit</button>
   </form>
-  <div [hidden]="dish">
+  <div [hidden]="dishes || errMess">
     <mat-spinner></mat-spinner><h4>Loading . . . Please Wait</h4>
+  </div>
+  <div *ngIf="errMess">
+    <h2>Error</h2>
+    <h4>{{errMess}}</h4>
   </div>
 </div>
