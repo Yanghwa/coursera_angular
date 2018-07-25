@@ -1,26 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Leader } from '../shared/leader';
-import { LEADERS } from '../shared/leaders';
+import { HttpClient } from '@angular/common/http';
+import { baseURL } from '../shared/baseurl';
+import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { Restangular } from 'ngx-restangular';
 
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { ProcessHTTPMsgService } from './process-httpmsg.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeaderService {
 
-  constructor() { }
-  
+  constructor(private restangular: Restangular) { }
+
   getLeaders(): Observable<Leader[]> {
-    return of(LEADERS).pipe(delay(2000));
+    return this.restangular.all('leaders').getList();
   }
 
   getLeader(id: number): Observable<Leader> {
-    return of(LEADERS.filter((leader) => (leader.id === id))[0]).pipe(delay(2000));
+    return  this.restangular.one('leaders', id).get();
   }
 
   getFeaturedLeader(): Observable<Leader> {
-    return of(LEADERS.filter((leader) => leader.featured)[0]).pipe(delay(2000));
+    return this.restangular.all('leaders').getList({featured: true}).pipe(map(leaders => leaders[0]));
   }
 }
