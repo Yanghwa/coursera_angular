@@ -8,9 +8,10 @@ export function visibility() {
         })),
         state('hidden', style({
             transform: 'scale(0.5)',
-            opacity: 0
-        })),
-        transition('* => *', animate('0.5s ease-in-out'))
+            opacity: 0,
+            display: 'none'
+        }))
+        // transition('* => *', animate('0.5s ease-in-out'))
     ]);
 }
 

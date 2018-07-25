@@ -1,8 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
 
-import { flyInOut, expand } from '../animations/app.animation';
+import { visibility, flyInOut, expand } from '../animations/app.animation';
+
+import { FeedbackService } from '../services/feedback.service';
 
 @Component({
   selector: 'app-contact',
@@ -14,6 +16,7 @@ import { flyInOut, expand } from '../animations/app.animation';
   },
   animations: [
     flyInOut(),
+    visibility(),
     expand()
   ]
 })
@@ -30,6 +33,11 @@ export class ContactComponent implements OnInit {
     'telnum': '',
     'email': ''
   };
+  errMess: string;
+
+  visibility = 'shown';
+  feedbackVisibility = 'hidden';
+  resFeedback: Feedback;
 
   validationMessages = {
     'firstname': {
@@ -52,7 +60,7 @@ export class ContactComponent implements OnInit {
     },
   };
 
-  constructor(private fb: FormBuilder) { 
+  constructor(private feedbackservice: FeedbackService, private fb: FormBuilder, @Inject('BaseURL') private BaseURL) { 
     this.createForm();
   }
 
@@ -76,9 +84,14 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit() {
-    this.feedback = this.feedbackForm.value;  
-    console.log(this.feedback);
-    // this.feedbackFormDirective.resetForm();
+    this.feedback = this.feedbackForm.value;
+    this.visibility = 'hidden';
+    this.feedbackVisibility = 'shown';
+    this.feedbackservice.submitFeedback(this.feedback).subscribe(feedback => {
+      this.resFeedback = feedback;
+      setInterval(()=>{this.visibility = 'shown';this.feedbackVisibility = 'hidden';}, 5000);
+    }, errMess => this.errMess = <any>errMess);
+    this.feedbackFormDirective.resetForm();
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',
