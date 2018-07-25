@@ -19,6 +19,7 @@ export class DishdetailComponent implements OnInit {
   @ViewChild('fform') newCommentFormDirective;
 
   dish: Dish;
+  dishcopy = null;
   dishIds: number[];
   prev: number;
   next: number;
@@ -48,7 +49,7 @@ export class DishdetailComponent implements OnInit {
   ngOnInit() {
     this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds, errmess => this.errMess = <any>errmess.message);
     this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(+params['id'])))
-    .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); });
+    .subscribe(dish => { this.dish = dish; this.dishcopy = dish; this.setPrevNext(dish.id); }, errMess => { this.dish = null; this.errMess = <any>errMess;});
   }
 
   goBack(): void {
@@ -78,7 +79,8 @@ export class DishdetailComponent implements OnInit {
     this.newComment = this.newCommentForm.value;
     this.newComment.date = new Date().toISOString();
     console.log(this.newComment);
-    this.dish.comments.push(this.newComment);
+    this.dishcopy.comments.push(this.newComment);
+    this.dishcopy.save().subscribe(dish => { this.dish = dish; console.log(dish); });
     this.newCommentFormDirective.resetForm();
     this.newCommentForm.reset({
       author: '',
